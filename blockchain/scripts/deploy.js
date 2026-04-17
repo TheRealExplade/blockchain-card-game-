@@ -18,6 +18,13 @@ async function main() {
 
   const marketAddress = market.address;
   console.log("Marketplace deployed to:", marketAddress);
+
+
+  const Trade = await ethers.getContractFactory("Trade");
+  const trade = await Trade.deploy(nft.address);
+  await trade.deployed();
+
+  console.log("Trade deployed to:", trade.address);
 }
 
 main().catch((error) => {

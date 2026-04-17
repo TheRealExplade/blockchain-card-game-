@@ -2,6 +2,7 @@ import { useState } from "react";
 import { getSigner } from "./utils/contract";
 import MyCards from "./components/MyCards";
 import Marketplace from "./components/Marketplace";
+import Trade from "./components/Trade";
 function App() {
   const [account, setAccount] = useState("");
 
@@ -24,6 +25,7 @@ function App() {
         <button onClick={connectWallet}>Connect Wallet</button>
       )}
       <Marketplace />
+      <Trade account={account} />
     </div>
   );
 }

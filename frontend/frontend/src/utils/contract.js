@@ -1,7 +1,8 @@
 import { ethers } from "ethers";
 
-const NFT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-export const MARKET_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+const NFT_ADDRESS = "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e";
+export const MARKET_ADDRESS = "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0";
+export const TRADE_ADDRESS = "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82";
 
 const NFT_ABI = [
   "function mintCard(address to,string name,string image,string cardType,uint256 hp,string rarity)",
@@ -19,6 +20,17 @@ const MARKET_ABI = [
   "function getAllListings() view returns (uint256[])",
   "function listings(uint256) view returns (address seller, uint256 price)"
 ];
+
+const TRADE_ABI = [
+  "function createTrade(address to,uint256 offeredToken,uint256 requestedToken)",
+  "function acceptTrade(uint256 tradeId)",
+  "function getTrades() view returns (tuple(address from,address to,uint256 offeredToken,uint256 requestedToken,bool active)[])"
+];
+
+export const getTradeContract = async () => {
+  const signer = await getSigner();
+  return new ethers.Contract(TRADE_ADDRESS, TRADE_ABI, signer);
+};
 
 // ✅ Ethers v6 way
 export const getProvider = () => {
@@ -40,3 +52,4 @@ export const getMarketContract = async () => {
   const signer = await getSigner();
   return new ethers.Contract(MARKET_ADDRESS, MARKET_ABI, signer);
 };
+

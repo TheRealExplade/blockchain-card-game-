@@ -6,55 +6,58 @@ function Marketplace() {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    loadListings();
-  }, []);
+  loadListings();
+}, []);
 
   const loadListings = async () => {
-    const market = await getMarketContract();
-    const nft = await getNFTContract();
+  const market = await getMarketContract();
+  const nft = await getNFTContract();
 
-    const tokenIds = await market.getAllListings();
+  const ids = await market.getAllListings();
 
-    const listedItems = [];
+  const items = [];
 
-    for (let id of tokenIds) {
-      try {
-        const listing = await market.listings(id);
-        const card = await nft.getCard(id);
+  for (let id of ids) {
+    const listing = await market.listings(id);
 
-        listedItems.push({
-          id: id.toString(),
-          price: ethers.formatEther(listing.price),
-          name: card.name,
-          image: card.image,
-          type: card.cardType,
-          hp: card.hp.toString(),
-          rarity: card.rarity
-        });
-      } catch (err) {
-        console.log("Error loading listing", id);
-      }
-    }
+    if (!listing.price || listing.price.toString() === "0") continue;
 
-    setItems(listedItems);
-  };
+    const card = await nft.getCard(id);
+
+    items.push({
+      id,
+      price: listing.price,
+      seller: listing.seller,
+      name: card.name,
+      image: card.image,
+      type: card.cardType,
+      hp: card.hp.toString(),
+      rarity: card.rarity
+    });
+  }
+
+  setItems(items);
+};
 
   const buyCard = async (id, price) => {
-    try {
-      const market = await getMarketContract();
+  try {
+    const market = await getMarketContract();
 
-      const tx = await market.buyCard(id, {
-        value: ethers.parseEther(price)
-      });
+    const tx = await market.buyCard(id, {
+      value: price
+    });
 
-      await tx.wait();
+    await tx.wait();
 
-      alert("Card bought!");
-      loadListings();
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    alert("Card bought!");
+
+    // 🔥 REFRESH
+    await loadListings();
+
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   return (
     <div>
@@ -66,7 +69,7 @@ function Marketplace() {
             <img src={item.image} width="100%" />
             <h3>{item.name}</h3>
             <p>HP: {item.hp}</p>
-            <p>Price: {item.price} ETH</p>
+            <p>Price: {ethers.formatEther(item.price)} ETH</p>
 
             <button onClick={() => buyCard(item.id, item.price)}>
               Buy
